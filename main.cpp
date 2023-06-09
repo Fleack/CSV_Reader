@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 {
     if (argc < 2)
     {
-        std::cout << "Enter csv file's name!";
+        std::cout << "Enter name of csv file!";
         return 1;
     }
 

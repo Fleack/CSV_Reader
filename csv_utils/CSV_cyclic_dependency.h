@@ -2,7 +2,8 @@
 #include <unordered_set>
 
 #include "CSV_table.h"
-#include "CSV_expression.h"
+
+#include "../csv_fields/CSV_expression.h"
 
 class CSV_cyclic_dependency
 {

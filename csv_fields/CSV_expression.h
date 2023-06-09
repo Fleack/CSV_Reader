@@ -4,7 +4,8 @@
 #include <stdexcept>
 
 #include "CSV_field.h"
-#include "IOperation.h"
+
+#include "../csv_operations/IOperation.h"
 
 class CSV_expression : public CSV_field
 {
