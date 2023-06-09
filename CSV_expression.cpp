@@ -28,25 +28,20 @@ CSV_expression::~CSV_expression() = default;
 
 long long CSV_expression::get_value() const
 {
-	// ”¡–¿“‹ œ–Œ¬≈– ”
-	if (left == nullptr || right == nullptr)
-	{
-		return -100500;
-	}
 	return (*op).get_result(left, right);
 }
 
 void CSV_expression::set_left(const std::shared_ptr<CSV_field>& value)
 {
 	if (!correct_value(value, this->left_column, this->left_row))
-		throw std::runtime_error(""); // ÓÔËÒ‡ÌËÂ
+		throw std::runtime_error("The passed value is not consistent with the column and row from the constructor");
 	this->left = value;
 }
 
 void CSV_expression::set_right(const std::shared_ptr<CSV_field>& value)
 {
 	if (!correct_value(value, this->right_column, this->right_row))
-		throw std::runtime_error(""); // ÓÔËÒ‡ÌËÂ
+		throw std::runtime_error("The passed value is not consistent with the column and row from the constructor");
 	this->right = value;
 }
 

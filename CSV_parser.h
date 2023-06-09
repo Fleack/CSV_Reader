@@ -29,7 +29,7 @@ private:
 
 	void insert(const std::string& field, CSV_table& table, const std::string& column, long long row) const;
 
-	void insert_value(const std::string& field, CSV_table& table, const std::string& column, long long row) const noexcept;
+	void insert_value(const std::string& field, CSV_table& table, const std::string& column, long long row) const;
 
 	void insert_expression(const std::string& field, CSV_table& table, const std::string& column, long long row) const;
 

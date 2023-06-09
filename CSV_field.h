@@ -4,7 +4,7 @@
 class CSV_field
 {
 public:
-	CSV_field(const std::string& column, long long row);
+	CSV_field(const std::string& column, long long row) noexcept;
 
 	virtual ~CSV_field();
 

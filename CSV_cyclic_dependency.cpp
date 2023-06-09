@@ -4,7 +4,7 @@ CSV_cyclic_dependency::CSV_cyclic_dependency() noexcept = default;
 
 CSV_cyclic_dependency::~CSV_cyclic_dependency() = default;
 
-bool CSV_cyclic_dependency::has_cyclic_dependencies(const CSV_table& table) const noexcept
+bool CSV_cyclic_dependency::has_cyclic_dependencies(const CSV_table& table) const
 {
     std::unordered_set<CSV_field*> visited;
     std::unordered_set<CSV_field*> path;
@@ -37,7 +37,7 @@ bool CSV_cyclic_dependency::has_cyclic_dependencies(
     const CSV_table& table,
     std::unordered_set<CSV_field*>& visited,
     std::unordered_set<CSV_field*>& path,
-    const std::shared_ptr<CSV_expression>& expr) const noexcept
+    const std::shared_ptr<CSV_expression>& expr) const
 {
     visited.insert(expr.get());
     path.insert(expr.get());
@@ -53,6 +53,7 @@ bool CSV_cyclic_dependency::has_cyclic_dependencies(
 
     if (visit_subexpr(table, visited, path, (*expr).get_left()))
         return true;
+
     if (visit_subexpr(table, visited, path, (*expr).get_right()))
         return true;
 
@@ -64,9 +65,8 @@ bool CSV_cyclic_dependency::visit_subexpr(
     const CSV_table& table,
     std::unordered_set<CSV_field*>& visited,
     std::unordered_set<CSV_field*>& path,
-    const std::shared_ptr<CSV_field>& expr) const noexcept
+    const std::shared_ptr<CSV_field>& expr) const
 {
-    
     if (std::shared_ptr<CSV_expression> temp = std::dynamic_pointer_cast<CSV_expression> (expr))
     {
         if (path.contains(temp.get()))
