@@ -10,3 +10,5 @@
 #include "Minus.h"
 #include "Multiplication.h"
 #include "Plus.h"
+
+//////// Добавить всё, что надо

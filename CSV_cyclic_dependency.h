@@ -12,19 +12,17 @@ public:
 
 	~CSV_cyclic_dependency();
 
-	bool has_cyclic_dependencies(
-		const Table& table,
-		const std::vector<std::string>& header,
-		const std::vector<long long>& rows) const noexcept;
+	bool has_cyclic_dependencies(const CSV_table& table) const noexcept;
 
 private:
 	bool has_cyclic_dependencies(
-		const Table& table,
+		const CSV_table& table,
 		std::unordered_set<CSV_field*>& visited,
 		std::unordered_set<CSV_field*>& path,
 		const std::shared_ptr<CSV_expression>& expr) const noexcept;
 
-	bool visit_subexpr(const Table& table,
+	bool visit_subexpr(
+		const CSV_table& table,
 		std::unordered_set<CSV_field*>& visited,
 		std::unordered_set<CSV_field*>& path,
 		const std::shared_ptr<CSV_field>& expr) const noexcept;

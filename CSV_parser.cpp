@@ -1,18 +1,21 @@
-#include "CSV.h"
+#include "CSV_parser.h"
 
 CSV_parser::CSV_parser() noexcept {}
 
 CSV_parser::~CSV_parser() {}
 
-void CSV_parser::read(const std::string& filename)
+CSV_table CSV_parser::read(const std::string& filename)
 {
 	std::unique_ptr<std::ifstream> pfile = std::make_unique<std::ifstream>(filename);
+
 	if (!(*pfile).is_open())
 		throw std::runtime_error(""); // описание
 
+	CSV_table table;
 	size_t table_columns = -1;
 	bool head = true;
 	std::string line;
+
 	while (std::getline(*pfile, line)) // Построчно читаем файл
 	{
 		// Производим разделение строки по ','
@@ -29,17 +32,22 @@ void CSV_parser::read(const std::string& filename)
 			if (values.size() == 0 || values.size() == 1)
 				throw std::runtime_error(""); // описание
 
-			header = values;
+			if (values[0] != "")
+				throw std::runtime_error(""); // описание
+
+			table.header = values;
 			table_columns = values.size();
 			for (size_t i = 1; i < table_columns; i++)
 			{
-				if (!is_string(header[i]))
+				if (!is_string(table.header[i]))
 					throw std::runtime_error(""); // описание
+
 				// Проверяем, нет ли уже столбца с таким же названием
-				if (table.contains(header[i]))
+				if (table.table.contains(table.header[i]))
 					throw std::runtime_error(""); // описание
+
 				std::unordered_map< long long, std::shared_ptr<CSV_field> > temp;
-				table.insert(std::make_pair(header[i], std::move(temp)));
+				table.table.insert(std::make_pair(table.header[i], std::move(temp)));
 			}
 			head = false;
 		}
@@ -54,34 +62,21 @@ void CSV_parser::read(const std::string& filename)
 			long long cur_row = std::stoll(values[0]);
 
 			// Проверяем, нет ли уже строки с таким же номером
-			if (table[header[1]].contains(cur_row))
+			if (table.table[table.header[1]].contains(cur_row))
 				throw std::runtime_error(""); // описание
 
-			rows.push_back(cur_row);
+			table.rows.push_back(cur_row);
 			for (size_t i = 1; i < table_columns; i++)
 			{
-				insert(values[i], table, header[i], cur_row);
+				insert(values[i], table, table.header[i], cur_row);
 			}
 		}
 	}
+
+	return std::move(table);
 }
 
-const Table& CSV_parser::get_table() const noexcept
-{
-	return table;
-}
-
-const std::vector<std::string>& CSV_parser::get_header() const noexcept
-{
-	return header;
-}
-
-const std::vector<long long>& CSV_parser::get_rows() const noexcept
-{
-	return rows;
-}
-
-void CSV_parser::insert(const std::string& field, Table& table, const std::string& column, long long row) const
+void CSV_parser::insert(const std::string& field, CSV_table& table, const std::string& column, long long row) const
 {
 	if (field.size() == 0)
 		throw std::runtime_error(""); // описание
@@ -96,13 +91,13 @@ void CSV_parser::insert(const std::string& field, Table& table, const std::strin
 	}
 }
 
-void CSV_parser::insert_value(const std::string& field, Table& table, const std::string& column, long long row) const noexcept
+void CSV_parser::insert_value(const std::string& field, CSV_table& table, const std::string& column, long long row) const noexcept
 {
 	long long t = std::stoll(field);
-	table[column][row] = std::make_shared<CSV_value>(column, row, t);
+	table.table[column][row] = std::make_shared<CSV_value>(column, row, t);
 }
 
-void CSV_parser::insert_expression(const std::string& field, Table& table, const std::string& column, long long row) const
+void CSV_parser::insert_expression(const std::string& field, CSV_table& table, const std::string& column, long long row) const
 {
 	const int MIN_EXPRESSION_LEN = 6; // =A1+A1, меньше невозможно
 	if (field.size() < MIN_EXPRESSION_LEN)
@@ -118,7 +113,7 @@ void CSV_parser::insert_expression(const std::string& field, Table& table, const
 	std::string right_column = get_column(cur_pos, field);
 	long long right_row = get_row(cur_pos, field);
 
-	table[column][row] = std::make_shared<CSV_expression>(column, row, left_column, left_row, right_column, right_row, op);
+	table.table[column][row] = std::make_shared<CSV_expression>(column, row, left_column, left_row, right_column, right_row, op);
 }
 
 long long CSV_parser::get_row(size_t& start_pos, const std::string& field) const

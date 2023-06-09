@@ -23,27 +23,15 @@ public:
 
 	~CSV_parser();
 
-	void read(const std::string& filename);
-
-	const Table& get_table() const noexcept;
-
-	const std::vector<std::string>& get_header() const noexcept;
-
-	const std::vector<long long>& get_rows() const noexcept;
+	CSV_table read(const std::string& filename);
 
 private:
 
-	Table table;
+	void insert(const std::string& field, CSV_table& table, const std::string& column, long long row) const;
 
-	std::vector<std::string> header;
+	void insert_value(const std::string& field, CSV_table& table, const std::string& column, long long row) const noexcept;
 
-	std::vector<long long> rows;
-
-	void insert(const std::string& field, Table& table, const std::string& column, long long row) const;
-
-	void insert_value(const std::string& field, Table& table, const std::string& column, long long row) const noexcept;
-
-	void insert_expression(const std::string& field, Table& table, const std::string& column, long long row) const;
+	void insert_expression(const std::string& field, CSV_table& table, const std::string& column, long long row) const;
 
 	long long get_row(size_t& start_pos, const std::string& field) const;
 
