@@ -17,16 +17,28 @@ public:
 
 	CSV_expression(
 		const std::string& column, long long row,
-		const CSV_field* left, const CSV_field* right,
+		const std::shared_ptr<CSV_field>& left, const std::shared_ptr<CSV_field>& right,
 		std::shared_ptr<IOperation>& op) noexcept;
 
 	~CSV_expression();
 
 	long long get_value() const override;
 
-	void set_left(const CSV_field* value);
+	void set_left(const std::shared_ptr<CSV_field>& value);
 
-	void set_right(const CSV_field* value);
+	void set_right(const std::shared_ptr<CSV_field>& value);
+
+	const std::shared_ptr<CSV_field>& get_left() const noexcept;
+
+	const std::shared_ptr<CSV_field>& get_right() const noexcept;
+
+	const std::string& get_left_column() const noexcept;
+
+	const std::string& get_right_column() const noexcept;
+
+	long long get_left_row() const noexcept;
+
+	long long get_right_row() const noexcept;
 
 private:
 	const std::string left_column;
@@ -35,10 +47,10 @@ private:
 	const long long left_row;
 	const long long right_row;
 
-	const CSV_field* left = nullptr;
-	const CSV_field* right = nullptr;
+	std::shared_ptr<CSV_field> left;
+	std::shared_ptr<CSV_field> right;
 
 	std::shared_ptr<IOperation> op = nullptr;
 
-	bool check_value(const CSV_field* value) const noexcept;
+	bool correct_value(const std::shared_ptr<CSV_field>& value, const std::string& exp_column, long long exp_row) const noexcept;
 };

@@ -1,4 +1,4 @@
-#include "CSV_parser.h"
+#include "CSV.h"
 
 CSV_parser::CSV_parser() noexcept {}
 
@@ -104,7 +104,7 @@ void CSV_parser::insert_value(const std::string& field, Table& table, const std:
 
 void CSV_parser::insert_expression(const std::string& field, Table& table, const std::string& column, long long row) const
 {
-	const int MIN_EXPRESSION_LEN = 6;
+	const int MIN_EXPRESSION_LEN = 6; // =A1+A1, меньше невозможно
 	if (field.size() < MIN_EXPRESSION_LEN)
 		throw std::runtime_error(""); // описание
 
