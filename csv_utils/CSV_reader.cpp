@@ -9,24 +9,29 @@ void CSV_reader::print(const std::string& filename) const
 	CSV_table table = get_table(filename);
 	check_cycles(table);
 
+	std::string out;
+	out.reserve(table.header.size() * table.rows.size());
+
+	out += ' ';
 	for (const auto& column : table.header)
 	{
-		std::cout << column << ' ';
+		out += column + ' ';
 	}
-	std::cout << '\n';
+	out += '\n';
 
 	for (const auto& row : table.rows)
 	{
-		std::cout << row << ' ';
+		out += std::to_string(row) + ' ';
 		for (const auto& column : table.header)
 		{
 			if (column == "")
 				continue;
 
-			std::cout << (*table.table[column][row]).get_value() << ' ';
+			out += std::to_string( (*table.table[column][row]).get_value() ) + ' ';
 		}
-		std::cout << '\n';
+		out += '\n';
 	}
+	std::cout << out;
 }
 
 CSV_table CSV_reader::get_table(const std::string& filename) const
@@ -39,5 +44,5 @@ void CSV_reader::check_cycles(const CSV_table& table) const
 {
 	CSV_cyclic_dependency checker;
 	if (checker.has_cyclic_dependencies(table))
-		throw std::runtime_error("Given csv file has cyclic dependencies between fields"); // описание
+		throw std::runtime_error("Given csv file has cyclic dependencies between fields");
 }
