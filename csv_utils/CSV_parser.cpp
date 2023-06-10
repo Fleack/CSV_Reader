@@ -52,7 +52,7 @@ CSV_table CSV_parser::read(const std::string& filename)
 		}
 		// Otherwise, we check that the current line is equal in size to the header
 		// Adding the line number to the vector
-		// Insert the expression into the desired cell
+		// Insert the expression into the desired fields
 		else
 		{
 			if (values.size() != table_columns)
@@ -71,6 +71,9 @@ CSV_table CSV_parser::read(const std::string& filename)
 			}
 		}
 	}
+
+	if (table.header.empty() || table.rows.empty())
+		throw std::runtime_error("Incorrect file structure (most likely the file is empty, or only the header is specified)");
 
 	return table;
 }
