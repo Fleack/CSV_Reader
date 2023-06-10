@@ -69,9 +69,12 @@ bool CSV_cyclic_dependency::has_cyclic_dependencies(
         throw std::runtime_error("Incorrect value of one of the fields (a reference to a non-existent field)");
     }
 
-    (*expr).set_left( table.table.at(left_column).at(left_row) );
-    (*expr).set_right( table.table.at(right_column).at(right_row) );
+    if ((*expr).get_left().get() == nullptr)
+        (*expr).set_left(table.table.at(left_column).at(left_row));
 
+    if ((*expr).get_right().get() == nullptr)
+        (*expr).set_right(table.table.at(right_column).at(right_row));
+    
     if (visit_subexpr(table, visited, path, (*expr).get_left()))
         return true;
 
@@ -92,6 +95,9 @@ bool CSV_cyclic_dependency::visit_subexpr(
     {
         if (path.find(temp.get()) != path.end())
             return true;
+
+        if (visited.find(temp.get()) != visited.end())
+            return false;
 
         if (has_cyclic_dependencies(table, visited, path, temp))
             return true;
