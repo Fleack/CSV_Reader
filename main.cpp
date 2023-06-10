@@ -11,7 +11,15 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    std::string name = argv[1];
-    CSV_reader reader;
-    reader.print(name);
+	try
+	{
+		std::string name = argv[1];
+		CSV_reader reader;
+		reader.print(name);
+	}
+	catch (const std::exception& ex)
+	{
+		std::cout << "Exception!" << '\n';
+		std::cout << ex.what();
+	}
 }
