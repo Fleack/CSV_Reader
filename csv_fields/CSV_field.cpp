@@ -1,8 +1,14 @@
 #include "CSV_field.h"
 
 CSV_field::CSV_field(const std::string& column, long long row) noexcept
-	: column(column), row(row)
+	: column(column), row(row), value(std::nullopt)
 {
+}
+
+CSV_field::CSV_field(const std::string& column, long long row, long long value) noexcept
+	: CSV_field(column, row)
+{
+	this->value = value;
 }
 
 CSV_field::~CSV_field() = default;

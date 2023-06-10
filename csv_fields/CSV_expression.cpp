@@ -28,7 +28,9 @@ CSV_expression::~CSV_expression() = default;
 
 long long CSV_expression::get_value() const
 {
-	return (*op).get_result(left, right);
+	if (!value.has_value())
+		value = (*op).get_result(left, right);
+	return value.value();
 }
 
 void CSV_expression::set_left(const std::shared_ptr<CSV_field>& value)

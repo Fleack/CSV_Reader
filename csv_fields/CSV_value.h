@@ -9,7 +9,4 @@ public:
 	~CSV_value();
 
 	long long get_value() const override;
-
-private:
-	long long value;
 };

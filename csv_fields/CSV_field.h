@@ -1,10 +1,13 @@
 #pragma once
 #include <string>
+#include <optional>
 
 class CSV_field
 {
 public:
 	CSV_field(const std::string& column, long long row) noexcept;
+
+	CSV_field(const std::string& column, long long row, long long value) noexcept;
 
 	virtual ~CSV_field();
 
@@ -18,4 +21,6 @@ protected:
 	const std::string column;
 
 	const long long row;
+
+	mutable std::optional<long long> value;
 };
