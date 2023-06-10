@@ -18,15 +18,15 @@ CSV_table CSV_parser::read(const std::string& filename)
 
 	while (std::getline(*pfile, line))
 	{
-		// ѕроизводим разделение строки по ','
+		// Divide the string by ','
 		std::vector< std::string > values;
 		std::istringstream iss(line);
 		std::string temp;
 		while (std::getline(iss, temp, ','))
 			values.push_back(temp);
 
-		// ≈сли читаем заголовок, то запоминаем размер дл€ последующего сравнени€
-		// ƒобавл€ем дл€ каждого названи€ свой столбец
+		// If we read the title, then we remember the size for later comparison
+		// Adding a separate column for each name
 		if (head)
 		{
 			if (values.size() == 0 || values.size() == 1)
@@ -42,26 +42,26 @@ CSV_table CSV_parser::read(const std::string& filename)
 				if (!is_string(table.header[i]))
 					throw std::runtime_error("Name of column cannot consist of non-letter characters");
 
-				if (table.table.contains(table.header[i]))
-					throw std::runtime_error("Name of column already exists"); // описание
+				if (table.table.find(table.header[i]) != table.table.end())
+					throw std::runtime_error("Name of column already exists");
 
 				std::unordered_map< long long, std::shared_ptr<CSV_field> > temp;
 				table.table.insert(std::make_pair(table.header[i], std::move(temp)));
 			}
 			head = false;
 		}
-		// »наче провер€ем, что текуща€ строка по размеру равна заголовку
-		// ƒобавл€ем номер строки в вектор
-		// ¬ставл€ем в нужную €чейку выражение
+		// Otherwise, we check that the current line is equal in size to the header
+		// Adding the line number to the vector
+		// Insert the expression into the desired cell
 		else
 		{
 			if (values.size() != table_columns)
-				throw std::runtime_error("The size of the line is not consistent with the size of the header"); // описание
+				throw std::runtime_error("The size of the line is not consistent with the size of the header");
 
 			long long cur_row = std::stoll(values[0]);
 
-			if (table.table[table.header[1]].contains(cur_row))
-				throw std::runtime_error("Number of row already exists"); // описание
+			if (table.table[table.header[1]].find(cur_row) != table.table[table.header[1]].end())
+				throw std::runtime_error("Number of row already exists");
 
 			table.rows.push_back(cur_row);
 
@@ -78,7 +78,7 @@ CSV_table CSV_parser::read(const std::string& filename)
 void CSV_parser::insert(const std::string& field, CSV_table& table, const std::string& column, long long row) const
 {
 	if (field.size() == 0)
-		throw std::runtime_error("The field of csv file cannot be empty"); // описание
+		throw std::runtime_error("The field of csv file cannot be empty");
 
 	if (is_number(field))
 	{
@@ -98,9 +98,9 @@ void CSV_parser::insert_value(const std::string& field, CSV_table& table, const 
 
 void CSV_parser::insert_expression(const std::string& field, CSV_table& table, const std::string& column, long long row) const
 {
-	const int MIN_EXPRESSION_LEN = 6; // =A1+A1 | меньше по размеру невозможно
+	const int MIN_EXPRESSION_LEN = 6; // =A1+A1 | smaller in size is not possible
 	if (field.size() < MIN_EXPRESSION_LEN || field[0] != '=')
-		throw std::runtime_error("Invalid expression syntax in csv file"); // описание
+		throw std::runtime_error("Invalid expression syntax in csv file");
 
 	size_t cur_pos = 1;
 	std::string left_column = get_column(cur_pos, field);
@@ -166,7 +166,7 @@ std::shared_ptr<IOperation> CSV_parser::get_operation(size_t& start_pos, const s
 	}
 
 	if (op == nullptr)
-		throw std::runtime_error("Invalid operation syntax"); // описание
+		throw std::runtime_error("Invalid operation syntax");
 
 	start_pos++;
 	return op;

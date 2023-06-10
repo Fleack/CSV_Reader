@@ -16,7 +16,7 @@ bool CSV_cyclic_dependency::has_cyclic_dependencies(const CSV_table& table) cons
                 continue;
 
             const std::shared_ptr<CSV_field>& field = table.table.at(j).at(i);
-            if (visited.contains(field.get()))
+            if (visited.find(field.get()) != visited.end())
                 continue;
             
             if ( std::shared_ptr<CSV_expression> temp = std::dynamic_pointer_cast<CSV_expression> (field) )
@@ -69,7 +69,7 @@ bool CSV_cyclic_dependency::visit_subexpr(
 {
     if (std::shared_ptr<CSV_expression> temp = std::dynamic_pointer_cast<CSV_expression> (expr))
     {
-        if (path.contains(temp.get()))
+        if (path.find(temp.get()) != path.end())
             return true;
 
         if (has_cyclic_dependencies(table, visited, path, temp))
