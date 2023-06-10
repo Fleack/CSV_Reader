@@ -12,10 +12,19 @@ bool CSV_cyclic_dependency::has_cyclic_dependencies(const CSV_table& table) cons
     {
         for (auto& j : table.header)
         {
-            if (j == "") // Столбец с номерами строк
+            if (j == "") // Column with row numbers
                 continue;
 
-            const std::shared_ptr<CSV_field>& field = table.table.at(j).at(i);
+            std::shared_ptr<CSV_field> field = nullptr;
+            try
+            {
+                field = table.table.at(j).at(i);
+            }
+            catch (const std::exception&)
+            {
+                throw std::runtime_error("Incorrect value of one of the fields (a reference to a non-existent field)");
+            }
+
             if (visited.find(field.get()) != visited.end())
                 continue;
             
@@ -47,6 +56,18 @@ bool CSV_cyclic_dependency::has_cyclic_dependencies(
 
     const std::string& right_column = expr.get()->get_right_column();
     long long right_row = expr.get()->get_right_row();
+
+    std::shared_ptr<CSV_field> left;
+    std::shared_ptr<CSV_field> right;
+    try
+    {
+        left = table.table.at(left_column).at(left_row);
+        right = table.table.at(right_column).at(right_row);
+    }
+    catch (const std::exception&)
+    {
+        throw std::runtime_error("Incorrect value of one of the fields (a reference to a non-existent field)");
+    }
 
     (*expr).set_left( table.table.at(left_column).at(left_row) );
     (*expr).set_right( table.table.at(right_column).at(right_row) );
