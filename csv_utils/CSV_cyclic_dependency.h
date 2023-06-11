@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_set>
 
-#include "CSV_table.h"
+#include "CSV_table.hpp"
 
 #include "../csv_fields/CSV_expression.h"
 
@@ -27,5 +27,12 @@ private:
 		std::unordered_set<CSV_field*>& visited,
 		std::unordered_set<CSV_field*>& path,
 		const std::shared_ptr<CSV_field>& expr) const;
+
+	std::shared_ptr<CSV_field> get_subfield(
+		const CSV_table& table,
+		std::unordered_set<CSV_field*>& visited,
+		std::unordered_set<CSV_field*>& path,
+		const std::shared_ptr<CSV_field>& expr,
+		const std::string& operand) const;
 };
 

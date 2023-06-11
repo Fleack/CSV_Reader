@@ -1,17 +1,21 @@
 cmake_minimum_required(VERSION 3.12)
 project(CSV_Reader)
 
-#set(CMAKE_CXX_COMPILER "C:/MinGW/bin/g++.exe")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_CXX_COMPILER "C:/Users/melni/gcc/bin/g++.exe")
 
 set(csv_fields_sources
     csv_fields/CSV_expression.cpp
     csv_fields/CSV_field.cpp
+	csv_fields/CSV_operation_number.cpp
     csv_fields/CSV_value.cpp
 )
 
 set(csv_fields_headers
     csv_fields/CSV_expression.h
     csv_fields/CSV_field.h
+	csv_fields/CSV_operation_number.h
     csv_fields/CSV_value.h
 )
 
@@ -34,13 +38,15 @@ set(csv_utils_sources
     csv_utils/CSV_cyclic_dependency.cpp
     csv_utils/CSV_parser.cpp
     csv_utils/CSV_reader.cpp
+	csv_utils/CSV_utilfunc.cpp
 )
 
 set(csv_utils_headers
     csv_utils/CSV_cyclic_dependency.h
     csv_utils/CSV_parser.h
     csv_utils/CSV_reader.h
-    csv_utils/CSV_table.h
+    csv_utils/CSV_table.hpp
+	csv_utils/CSV_utilfunc.h
 )
 
 add_executable(CSV_Reader

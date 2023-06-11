@@ -101,50 +101,40 @@ void CSV_parser::insert_value(const std::string& field, CSV_table& table, const 
 
 void CSV_parser::insert_expression(const std::string& field, CSV_table& table, const std::string& column, long long row) const
 {
-	const int MIN_EXPRESSION_LEN = 6; // =A1+A1 | smaller in size is not possible
+	const int MIN_EXPRESSION_LEN = 4; // =0+0 | smaller in size is not possible
 	if (field.size() < MIN_EXPRESSION_LEN || field[0] != '=')
 		throw std::runtime_error("Invalid expression syntax in csv file");
 
 	size_t cur_pos = 1;
-	std::string left_column = get_column(cur_pos, field);
-	long long left_row = get_row(cur_pos, field);
+
+	std::string left_operand = get_operand(cur_pos, field);
 	std::shared_ptr<IOperation> op = get_operation(cur_pos, field);
-	std::string right_column = get_column(cur_pos, field);
-	long long right_row = get_row(cur_pos, field);
+	std::string right_operand = get_operand(cur_pos, field);
 
-	table.table[column][row] = std::make_shared<CSV_expression>(column, row, left_column, left_row, right_column, right_row, op);
+	table.table[column][row] = std::make_shared<CSV_expression>(column, row, left_operand, right_operand, op);
 }
 
-long long CSV_parser::get_row(size_t& start_pos, const std::string& field) const
+std::string CSV_parser::get_operand(size_t& start_pos, const std::string& field) const
 {
-	long long row = 0;
-	for (size_t i = start_pos; i < field.size(); i++)
+	const size_t start = start_pos;
+	std::string operand = "";
+	for (size_t i = start; i < field.size(); i++)
 	{
-		if (is_digit(field[i]))
+		if ( is_letter(field[i]) || is_digit(field[i]) || (i == start && is_operator(field[i])) )
 		{
-			row = row * 10 + static_cast<long long>(field[i] - '0');
+			operand += field[i];
 			start_pos++;
 		}
 		else
-			break;
-	}
-	return row;
-}
-
-std::string CSV_parser::get_column(size_t& start_pos, const std::string& field) const
-{
-	std::string column = "";
-	for (size_t i = start_pos; i < field.size(); i++)
-	{
-		if (is_letter(field[i]))
 		{
-			column += field[i];
-			start_pos++;
-		}
-		else
 			break;
+		}
 	}
-	return column;
+
+	if (!is_operand_correct(operand))
+		throw std::runtime_error("Invalid operand in one of the fields");
+
+	return operand;
 }
 
 std::shared_ptr<IOperation> CSV_parser::get_operation(size_t& start_pos, const std::string& field) const
@@ -175,39 +165,34 @@ std::shared_ptr<IOperation> CSV_parser::get_operation(size_t& start_pos, const s
 	return op;
 }
 
-inline bool CSV_parser::is_number(const std::string& field) const noexcept
+bool CSV_parser::is_operand_correct(const std::string& operand) const noexcept
 {
-	if (field.size() == 0)
-		return false;
+	if (is_number(operand))
+		return true;
 
-	for (char c : field)
+	bool letters = false;
+	bool digits = false;
+
+	// First there are only letters, then only numbers
+	for (char c : operand)
 	{
-		if (!is_digit(c))
+		if (is_letter(c))
+		{
+			if (digits)
+				return false;
+			letters = true;
+		}
+		else if (is_digit(c))
+		{
+			if (!letters)
+				return false;
+			digits = true;
+		}
+		else
+		{
 			return false;
+		}
 	}
 
-	return true;
-}
-
-inline bool CSV_parser::is_letter(char c) const noexcept
-{
-	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
-}
-
-inline bool CSV_parser::is_digit(char c) const noexcept
-{
-	return (c >= '0' && c <= '9');
-}
-
-inline bool CSV_parser::is_string(const std::string& str) const noexcept
-{
-	if (str.size() == 0)
-		return false;
-
-	for (char c : str)
-	{
-		if (!is_letter(c))
-			return false;
-	}
-	return true;
+	return letters && digits;
 }

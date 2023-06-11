@@ -6,7 +6,8 @@
 #include <unordered_map>
 #include <memory>
 
-#include "CSV_table.h"
+#include "CSV_table.hpp"
+#include "CSV_utilfunc.h"
 
 #include "../csv_fields/CSV_field.h"
 #include "../csv_fields/CSV_value.h"
@@ -35,18 +36,10 @@ private:
 
 	void insert_expression(const std::string& field, CSV_table& table, const std::string& column, long long row) const;
 
-	long long get_row(size_t& start_pos, const std::string& field) const;
-
-	std::string get_column(size_t& start_pos, const std::string& field) const;
-
 	std::shared_ptr<IOperation> get_operation(size_t& start_pos, const std::string& field) const;
 
-	bool is_number(const std::string& field) const noexcept;
+	std::string get_operand(size_t& start_pos, const std::string& field) const;
 
-	inline bool is_letter(char c) const noexcept;
-
-	inline bool is_digit(char c) const noexcept;
-
-	inline bool is_string(const std::string& str) const noexcept;
+	bool is_operand_correct(const std::string& operand) const noexcept;
 };
 

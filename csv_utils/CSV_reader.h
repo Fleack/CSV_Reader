@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ostream>
 
-#include "CSV_table.h"
+#include "CSV_table.hpp"
 #include "CSV_parser.h"
 #include "CSV_cyclic_dependency.h"
 

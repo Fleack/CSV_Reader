@@ -51,35 +51,39 @@ bool CSV_cyclic_dependency::has_cyclic_dependencies(
     visited.insert(expr.get());
     path.insert(expr.get());
 
-    const std::string& left_column = expr.get()->get_left_column();
-    long long left_row = expr.get()->get_left_row();
-
-    const std::string& right_column = expr.get()->get_right_column();
-    long long right_row = expr.get()->get_right_row();
-
+    const std::string& left_operand = (*expr).get_left_operand();
     std::shared_ptr<CSV_field> left;
-    std::shared_ptr<CSV_field> right;
-    try
+    if (!is_number(left_operand))
     {
-        left = table.table.at(left_column).at(left_row);
-        right = table.table.at(right_column).at(right_row);
+        left = get_subfield(table, visited, path, expr, left_operand);
+
+        if (visit_subexpr(table, visited, path, left))
+            return true;
     }
-    catch (const std::exception&)
+    else
     {
-        throw std::runtime_error("Incorrect value of one of the fields (a reference to a non-existent field)");
+        left = std::make_shared<CSV_operation_number>(std::stoll(left_operand));
     }
 
     if ((*expr).get_left().get() == nullptr)
-        (*expr).set_left(table.table.at(left_column).at(left_row));
+        (*expr).set_left(left);
+
+    const std::string& right_operand = (*expr).get_right_operand();
+    std::shared_ptr<CSV_field> right;
+    if (!is_number(right_operand))
+    {
+        right = get_subfield(table, visited, path, expr, right_operand);
+
+        if (visit_subexpr(table, visited, path, right))
+            return true;
+    }
+    else
+    {
+        right = std::make_shared<CSV_operation_number>(std::stoll(right_operand));
+    }
 
     if ((*expr).get_right().get() == nullptr)
-        (*expr).set_right(table.table.at(right_column).at(right_row));
-    
-    if (visit_subexpr(table, visited, path, (*expr).get_left()))
-        return true;
-
-    if (visit_subexpr(table, visited, path, (*expr).get_right()))
-        return true;
+        (*expr).set_right(right);
 
     path.erase(expr.get());
     return false;
@@ -107,4 +111,28 @@ bool CSV_cyclic_dependency::visit_subexpr(
         visited.insert(expr.get());
     }
     return false;
+}
+
+std::shared_ptr<CSV_field> CSV_cyclic_dependency::get_subfield(
+    const CSV_table& table,
+    std::unordered_set<CSV_field*>& visited,
+    std::unordered_set<CSV_field*>& path,
+    const std::shared_ptr<CSV_field>& expr,
+    const std::string& operand) const
+{
+    std::pair<std::string, long long> temp = parse_operand(operand);
+    std::string column = temp.first;
+    long long row = temp.second;
+    std::shared_ptr<CSV_field> op_ptr;
+
+    try
+    {
+        op_ptr = table.table.at(column).at(row);
+    }
+    catch (const std::exception&)
+    {
+        throw std::runtime_error("Incorrect value of one of the fields (a reference to a non-existent field)");
+    }
+
+    return op_ptr;
 }
